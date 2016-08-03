@@ -8,11 +8,16 @@ import(
 
 func init() {
   fmt.Println("Benchmark setup")
+
+  PythonSetPath("/Users/matias/dev/dispatcher/python")
+
   PythonInit()
+  PythonLoadDispatcher()
 }
 
 func BenchmarkJsonMode(b *testing.B) {
   d := NewDispatcher(JsonMode)
+
   for i := 0; i < 200; i++ {
     object := Object{
       Name: "theObject",
@@ -22,9 +27,11 @@ func BenchmarkJsonMode(b *testing.B) {
     time.Sleep(1*time.Millisecond)
     d.Dispatch(&object)
   }
+
 }
 
-func BenchmarkMsgpackNode(b *testing.B) {
+/*
+func BenchmarkMsgpackMode(b *testing.B) {
   d := NewDispatcher(MsgPackMode)
   for i := 0; i < 200; i++ {
     object := Object{
@@ -36,3 +43,4 @@ func BenchmarkMsgpackNode(b *testing.B) {
     d.Dispatch(&object)
   }
 }
+*/
