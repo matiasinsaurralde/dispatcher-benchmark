@@ -54,8 +54,18 @@ static void Python_SetEnv(char* python_path) {
   setenv("PYTHONPATH", python_path, 1 );
 }
 
-static void Python_Dispatch(char* object) {
+static char* Python_Dispatch(char* object) {
   printf("dispatching: %s\n", object);
+
+  PyObject *args = PyTuple_Pack( 1, PyUnicode_FromString(object) );
+  PyObject *result = PyObject_CallObject( dispatcher_dispatch, args );
+  if( result == NULL ) {
+    PyErr_Print();
+    return NULL;
+  } else {
+    char *payload = PyUnicode_AsUTF8(result);
+    return payload;
+  }
 }
 */
 import "C"
@@ -87,10 +97,12 @@ func SetPath(path string) {
   C.Python_SetEnv((CPath))
 }
 
-func DispatchString(object []byte) {
+func DispatchString(object []byte) string {
   s := string(object)
   CObject := C.CString(s)
-  C.Python_Dispatch(CObject)
+  var output *C.char
+  output = C.Python_Dispatch(CObject)
+  return C.GoString(output)
 }
 
 func DispatchBytes(object []byte) {

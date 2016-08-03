@@ -43,15 +43,15 @@ func PythonLoadDispatcher() error {
   return python.LoadDispatcher()
 }
 
-func PythonDispatch(object []byte) {
-  python.DispatchString(object)
+func PythonDispatchString(object []byte) string {
+  return python.DispatchString(object)
 }
 
 func PythonSetPath(path string) {
   python.SetPath(path)
 }
 
-func (d *Dispatcher) Dispatch(o *Object) ([]byte, error) {
+func (d *Dispatcher) Dispatch(o *Object) (interface{}, error) {
   var data []byte
   var err error
   switch d.Mode {
@@ -62,6 +62,9 @@ func (d *Dispatcher) Dispatch(o *Object) ([]byte, error) {
     data, err = o.MarshalMsg(nil)
     // log.Print(string(data), len(data))
   }
-  python.DispatchString(data)
-  return data, err
+
+  var output interface{}
+  output = python.DispatchString(data)
+
+  return output, err
 }
