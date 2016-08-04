@@ -1,13 +1,10 @@
 import json, ujson
 
-def process(serialized_object):
+def dispatch_json_string(serialized_object):
     object = json.loads(serialized_object)
     object['Message'] = "modified message"
     serialized_object = json.dumps(object)
     return serialized_object
-
-def dispatch_json_string(serialized_object):
-    print("from python: dispatch_json_string", serialized_object)
 
 def dispatch_ujson_string(serialized_object):
     object = ujson.loads(serialized_object)
