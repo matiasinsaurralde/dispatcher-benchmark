@@ -14,7 +14,6 @@ package python
 
 static int Python_Init() {
   Py_Initialize();
-  printf("Py_Initialize\n");
   return Py_IsInitialized();
 }
 
@@ -22,9 +21,8 @@ static int Python_LoadDispatcher() {
   PyObject *module_name = PyUnicode_FromString( dispatcher_module_name );
   dispatcher_module = PyImport_Import( module_name );
 
-
   if( dispatcher_module == NULL ) {
-  printf("dispatcher_module error\n");
+    printf("dispatcher_module error\n");
     PyErr_Print();
     return -1;
   }
@@ -32,23 +30,21 @@ static int Python_LoadDispatcher() {
   dispatcher_dict = PyModule_GetDict(dispatcher_module);
 
   if( dispatcher_dict == NULL ) {
-  printf("dispatcher_dict error\n");
+    printf("dispatcher_dict error\n");
     PyErr_Print();
     return -1;
   }
-
-  dispatcher_dispatch = PyDict_GetItemString(dispatcher_dict, hook_name);
 
   dispatch_json_string_hook = PyDict_GetItemString(dispatcher_dict, dispatch_json_string);
   dispatch_ujson_string_hook = PyDict_GetItemString(dispatcher_dict, dispatch_ujson_string);
   dispatch_native_object_hook = PyDict_GetItemString(dispatcher_dict, dispatch_native_object);
 
-  if( dispatcher_dispatch == NULL ) {
+  if( dispatch_json_string_hook == NULL || dispatch_ujson_string_hook == NULL || dispatch_native_object_hook == NULL ) {
     PyErr_Print();
     return -1;
   }
 
-  if( !PyCallable_Check(dispatcher_dispatch) ) {
+  if( !PyCallable_Check(dispatch_json_string_hook) || !PyCallable_Check(dispatch_ujson_string_hook) || !PyCallable_Check(dispatch_native_object_hook) ) {
     return -1;
   }
 
@@ -56,13 +52,13 @@ static int Python_LoadDispatcher() {
 }
 
 static void Python_SetEnv(char* python_path) {
-  printf("Setting PYTHONPATH to: %s\n", python_path );
+  // printf("Setting PYTHONPATH to: %s\n", python_path );
   setenv("PYTHONPATH", python_path, 1 );
 }
 
 static char* Python_DispatchJsonString(char* object) {
   PyObject *args = PyTuple_Pack( 1, PyUnicode_FromString(object) );
-  PyObject *result = PyObject_CallObject( dispatcher_dispatch, args );
+  PyObject *result = PyObject_CallObject( dispatch_json_string_hook, args );
 
   Py_DECREF(args);
 
