@@ -8,7 +8,7 @@ import(
   "encoding/json"
 )
 
-const iterations int = 15000
+const iterations int = 50000
 
 func init() {
   fmt.Println("Benchmark setup")
