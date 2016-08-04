@@ -5,6 +5,7 @@ import(
 
   "encoding/json"
   "unsafe"
+  "fmt"
 )
 
 /*
@@ -53,7 +54,7 @@ func NewDispatcher(mode int) Dispatcher {
   d := Dispatcher{
     Mode: mode,
   }
-  // log.Println("New dispatcher, using mode:", d.Mode)
+  fmt.Println("NewDispatcher")
   return d
 }
 
@@ -91,7 +92,6 @@ func (d *Dispatcher) Dispatch(o *Object) (interface{}, error) {
     data, err = json.Marshal(o)
     output = python.DispatchUJsonString(data)
   case NativeMode:
-    data, err = o.MarshalMsg(nil)
     var name *C.char
     name = C.CString(o.Name)
     var message *C.char
@@ -107,6 +107,21 @@ func (d *Dispatcher) Dispatch(o *Object) (interface{}, error) {
     o.Timestamp = newObject.Timestamp
 
     output = o
+  case MsgPackMode:
+    data, err = o.MarshalMsg(nil)
+    fmt.Println("o = ", *o)
+    dataStr := string(data)
+    var CData *C.char
+    CData = C.CString(dataStr)
+
+    var outputBytes []byte
+    outputBytes = python.DispatchMsgPackObject(unsafe.Pointer(CData))
+
+    var newObject Object
+    newObject.UnmarshalMsg(outputBytes)
+
+    fmt.Println("o2 = ", newObject)
+
   }
 
   return output, err
