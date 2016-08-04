@@ -1,5 +1,7 @@
 #include <Python.h>
 
+#include "../dispatcher.h"
+
 #ifndef DISPATCHER
 #define DISPATCHER
 
@@ -9,9 +11,9 @@ static void Python_SetEnv(char*);
 
 static char* Python_DispatchJsonString(char*);
 static char* Python_DispatchUJsonString(char*);
+static NativeObject* Python_DispatchNativeObject(void*);
 
 static char* dispatcher_module_name = "dispatcher";
-static char* hook_name = "process";
 
 static char* dispatch_json_string = "dispatch_json_string";
 static PyObject* dispatch_json_string_hook;
@@ -25,7 +27,5 @@ static PyObject* dispatch_native_object_hook;
 static PyObject* dispatcher;
 static PyObject* dispatcher_module;
 static PyObject* dispatcher_dict;
-
-static PyObject* dispatcher_dispatch;
 
 #endif
