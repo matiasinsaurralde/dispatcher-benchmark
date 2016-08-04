@@ -22,7 +22,7 @@ func main() {
     panic(err)
   }
 
-  shinyDispatcher := dispatcher.NewDispatcher(dispatcher.JsonMode)
+  shinyDispatcher := dispatcher.NewDispatcher(dispatcher.NativeMode)
 
   object := dispatcher.Object{
     Name: "theObject",
@@ -30,11 +30,14 @@ func main() {
     Timestamp: time.Now().Unix(),
   }
 
+  shinyDispatcher.Dispatch(&object)
+
+  /*
   var output interface{}
   output, err = shinyDispatcher.Dispatch(&object)
-
   var outputString string
   outputString = output.(string)
 
   fmt.Println("output = ", outputString)
+  */
 }
