@@ -12,6 +12,7 @@ static void Python_SetEnv(char*);
 static char* Python_DispatchJsonString(char*);
 static char* Python_DispatchUJsonString(char*);
 static NativeObject* Python_DispatchNativeObject(void*);
+static char* Python_DispatchMsgPackObject(void*);
 
 static char* dispatcher_module_name = "dispatcher";
 
@@ -23,6 +24,9 @@ static PyObject* dispatch_ujson_string_hook;
 
 static char* dispatch_native_object = "dispatch_native_object";
 static PyObject* dispatch_native_object_hook;
+
+static char* dispatch_msgpack_object = "dispatch_msgpack_object";
+static PyObject* dispatch_msgpack_object_hook;
 
 static PyObject* dispatcher;
 static PyObject* dispatcher_module;

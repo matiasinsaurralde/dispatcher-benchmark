@@ -38,13 +38,14 @@ static int Python_LoadDispatcher() {
   dispatch_json_string_hook = PyDict_GetItemString(dispatcher_dict, dispatch_json_string);
   dispatch_ujson_string_hook = PyDict_GetItemString(dispatcher_dict, dispatch_ujson_string);
   dispatch_native_object_hook = PyDict_GetItemString(dispatcher_dict, dispatch_native_object);
+  dispatch_msgpack_object_hook = PyDict_GetItemString(dispatcher_dict, dispatch_msgpack_object);
 
-  if( dispatch_json_string_hook == NULL || dispatch_ujson_string_hook == NULL || dispatch_native_object_hook == NULL ) {
+  if( dispatch_json_string_hook == NULL || dispatch_ujson_string_hook == NULL || dispatch_native_object_hook == NULL || dispatch_msgpack_object_hook == NULL ) {
     PyErr_Print();
     return -1;
   }
 
-  if( !PyCallable_Check(dispatch_json_string_hook) || !PyCallable_Check(dispatch_ujson_string_hook) || !PyCallable_Check(dispatch_native_object_hook) ) {
+  if( !PyCallable_Check(dispatch_json_string_hook) || !PyCallable_Check(dispatch_ujson_string_hook) || !PyCallable_Check(dispatch_native_object_hook) || !PyCallable_Check(dispatch_msgpack_object_hook) ) {
     return -1;
   }
 
@@ -131,6 +132,21 @@ static NativeObject* Python_DispatchNativeObject(void* p) {
   }
   return NULL;
 };
+
+static char* Python_DispatchMsgPackObject(void *p) {
+  char* serializedObject = (char*)p;
+
+  // printf("Python_DispatchMsgPackObject, serializedObject: %s\n", serializedObject);
+
+  PyObject *args = PyTuple_Pack( 1, PyBytes_FromString(serializedObject) );
+  PyObject *result = PyObject_CallObject( dispatch_msgpack_object_hook, args );
+
+  // PyObject* output = PyTuple_GetItem(result, 0);
+  char* outputString = PyBytes_AsString(result);
+
+  // return serializedObject;
+  return outputString;
+};
 */
 import "C"
 
@@ -210,5 +226,14 @@ func DispatchNativeObject(object unsafe.Pointer) Object {
   return obj
 }
 
+func DispatchMsgPackObject(object unsafe.Pointer) []byte {
+  var output *C.char
+  output = C.Python_DispatchMsgPackObject(object)
+
+  var outputStr string
+  outputStr = C.GoString(output)
+
+  return []byte(outputStr)
+}
 func DispatchBytes(object []byte) {
 }
