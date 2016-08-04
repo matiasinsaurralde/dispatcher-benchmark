@@ -4,17 +4,39 @@ import(
   "github.com/matiasinsaurralde/dispatcher-benchmark/python"
 
   "encoding/json"
-  // "log"
+  "unsafe"
 )
+
+/*
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#include "dispatcher.h"
+
+void* createNativeObject(char* name, char* message, int timestamp) {
+  int len = sizeof(NativeObject) + strlen(name) + strlen(message) + sizeof(int) + 1;
+  NativeObject* obj = (NativeObject*) malloc( len );
+
+  obj->name = name;
+  obj->message = message;
+  obj->timestamp = timestamp;
+
+  return obj;
+};
+*/
+import "C"
+
+type NativeObject C.struct_NativeObject
 
 const(
 	_ = iota
-  JsonMode
+  JsonStringMode
+  UJsonStringMode
 	NativeMode
 	MsgPackMode
 	ProtobufMode
 )
-
 
 type Dispatcher struct {
   Mode int
@@ -43,8 +65,12 @@ func PythonLoadDispatcher() error {
   return python.LoadDispatcher()
 }
 
-func PythonDispatchString(object []byte) string {
-  return python.DispatchString(object)
+func DispatchJsonString(object []byte) string {
+  return python.DispatchJsonString(object)
+}
+
+func DispatchUjsonString(object []byte) string {
+  return python.DispatchJsonString(object)
 }
 
 func PythonSetPath(path string) {
@@ -54,17 +80,33 @@ func PythonSetPath(path string) {
 func (d *Dispatcher) Dispatch(o *Object) (interface{}, error) {
   var data []byte
   var err error
+  var output interface{}
+
   switch d.Mode {
-  case JsonMode:
+  case JsonStringMode:
     data, err = json.Marshal(o)
     // log.Print(string(data), len(data))
-  case MsgPackMode:
+    output = DispatchJsonString(data)
+  case UJsonStringMode:
+    data, err = json.Marshal(o)
+    output = python.DispatchUJsonString(data)
+  case NativeMode:
     data, err = o.MarshalMsg(nil)
-    // log.Print(string(data), len(data))
-  }
+    var name *C.char
+    name = C.CString(o.Name)
+    var message *C.char
+    message = C.CString(o.Message)
+    var timestamp C.int
+    timestamp = C.int(o.Timestamp)
 
-  var output interface{}
-  output = python.DispatchString(data)
+    var objectPtr unsafe.Pointer
+    objectPtr = C.createNativeObject( name, message, timestamp )
+    var newObject python.Object = python.DispatchNativeObject(objectPtr)
+    o.Name = newObject.Name
+    o.Message = newObject.Message
+    o.Timestamp = newObject.Timestamp
+    output = o
+  }
 
   return output, err
 }
