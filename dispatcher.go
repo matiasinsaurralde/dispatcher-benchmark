@@ -105,6 +105,7 @@ func (d *Dispatcher) Dispatch(o *Object) (interface{}, error) {
     o.Name = newObject.Name
     o.Message = newObject.Message
     o.Timestamp = newObject.Timestamp
+
     output = o
   }
 

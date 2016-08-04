@@ -30,7 +30,15 @@ func main() {
     Timestamp: time.Now().Unix(),
   }
 
-  shinyDispatcher.Dispatch(&object)
+  fmt.Println( shinyDispatcher.Dispatch(&object) )
+
+  object2 := dispatcher.Object{
+    Name: "theObject",
+    Message: "the message",
+    Timestamp: time.Now().Unix(),
+  }
+
+  fmt.Println( shinyDispatcher.Dispatch(&object2) )
 
   /*
   var output interface{}
