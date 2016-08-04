@@ -5,7 +5,7 @@ import(
 
   "encoding/json"
   "unsafe"
-  "fmt"
+  // "fmt"
 )
 
 /*
@@ -54,7 +54,7 @@ func NewDispatcher(mode int) Dispatcher {
   d := Dispatcher{
     Mode: mode,
   }
-  fmt.Println("NewDispatcher")
+  // fmt.Println("NewDispatcher")
   return d
 }
 
@@ -109,7 +109,7 @@ func (d *Dispatcher) Dispatch(o *Object) (interface{}, error) {
     output = o
   case MsgPackMode:
     data, err = o.MarshalMsg(nil)
-    fmt.Println("o = ", *o)
+    // fmt.Println("o = ", *o)
     dataStr := string(data)
     var CData *C.char
     CData = C.CString(dataStr)
@@ -120,7 +120,7 @@ func (d *Dispatcher) Dispatch(o *Object) (interface{}, error) {
     var newObject Object
     newObject.UnmarshalMsg(outputBytes)
 
-    fmt.Println("o2 = ", newObject)
+    // fmt.Println("o2 = ", newObject)
 
   }
 

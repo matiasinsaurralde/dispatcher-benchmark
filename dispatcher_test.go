@@ -73,17 +73,18 @@ func BenchmarkNativeMode(b *testing.B) {
   }
 
 }
-/*
-func BenchmarkMsgpackMode(b *testing.B) {
+
+func BenchmarkMsgPackMode(b *testing.B) {
   d := NewDispatcher(MsgPackMode)
-  for i := 0; i < 200; i++ {
+
+  for i := 0; i < iterations; i++ {
     object := Object{
       Name: "theObject",
       Message: "the message",
       Timestamp: time.Now().Unix(),
     }
-    time.Sleep(1*time.Millisecond)
+    // time.Sleep(1*time.Millisecond)
     d.Dispatch(&object)
   }
+
 }
-*/
