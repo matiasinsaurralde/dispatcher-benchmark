@@ -63,11 +63,15 @@ static void Python_SetEnv(char* python_path) {
 static char* Python_DispatchJsonString(char* object) {
   PyObject *args = PyTuple_Pack( 1, PyUnicode_FromString(object) );
   PyObject *result = PyObject_CallObject( dispatcher_dispatch, args );
+
+  Py_DECREF(args);
+
   if( result == NULL ) {
     PyErr_Print();
     return NULL;
   } else {
     char *payload = PyUnicode_AsUTF8(result);
+    Py_DECREF(result);
     return payload;
   }
 }
@@ -75,20 +79,30 @@ static char* Python_DispatchJsonString(char* object) {
 static char* Python_DispatchUJsonString(char* object) {
   PyObject *args = PyTuple_Pack( 1, PyUnicode_FromString(object) );
   PyObject *result = PyObject_CallObject( dispatch_ujson_string_hook, args );
+
+  Py_DECREF(args);
+
   if( result == NULL ) {
     PyErr_Print();
     return NULL;
   } else {
     char *payload = PyUnicode_AsUTF8(result);
+    Py_DECREF(result);
     return payload;
   }
 }
 
 static NativeObject* Python_DispatchNativeObject(void* p) {
   NativeObject* obj = (NativeObject*)p;
+
   PyObject *n = Py_BuildValue("i", obj->timestamp);
+
   PyObject *args = PyTuple_Pack( 3, PyUnicode_FromString(obj->name), PyUnicode_FromString(obj->message), n );
   PyObject *result = PyObject_CallObject( dispatch_native_object_hook, args );
+
+  Py_DECREF(n);
+  Py_DECREF(args);
+
   if( result == NULL ) {
     PyErr_Print();
     return NULL;
@@ -109,6 +123,13 @@ static NativeObject* Python_DispatchNativeObject(void* p) {
     obj->name = name;
     obj->message = message;
     obj->timestamp = timestamp;
+
+    Py_DECREF(tupleName);
+    Py_DECREF(tupleMessage);
+    Py_DECREF(tupleTimestamp);
+
+    // Py_DECREF(result);
+    // printf("Py_REFCNT: %d\n", Py_REFCNT(result));
 
     return obj;
   }
@@ -157,7 +178,10 @@ func DispatchJsonString(object []byte) string {
   CObject := C.CString(s)
   var output *C.char
   output = C.Python_DispatchJsonString(CObject)
-  return C.GoString(output)
+  C.free(unsafe.Pointer(CObject))
+  var outputStr string
+  outputStr = C.GoString(output)
+  return outputStr
 }
 
 func DispatchUJsonString(object []byte) string {
