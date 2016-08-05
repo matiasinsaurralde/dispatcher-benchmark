@@ -5,7 +5,7 @@ import(
 
   "encoding/json"
   "unsafe"
-  // "fmt"
+  "fmt"
 )
 
 /*
@@ -44,10 +44,17 @@ type Dispatcher struct {
 }
 
 //go:generate msgp
+type NestedObject struct {
+  NestedStringField string `msg:"string_field"`
+  NestedIntField int `msg:"int_field"`
+}
+
+//go:generate msgp
 type Object struct {
   Name string `msg:"name"`
   Message string `msg:"message"`
-  Timestamp int64 `msg:"ts"`
+  Timestamp int `msg:"ts"`
+  NestedObject NestedObject `msg:"nested_object"`
 }
 
 func NewDispatcher(mode int) Dispatcher {
@@ -92,6 +99,7 @@ func (d *Dispatcher) Dispatch(o *Object) (interface{}, error) {
     data, err = json.Marshal(o)
     output = python.DispatchUJsonString(data)
   case NativeMode:
+    /*
     var name *C.char
     name = C.CString(o.Name)
     var message *C.char
@@ -106,10 +114,10 @@ func (d *Dispatcher) Dispatch(o *Object) (interface{}, error) {
     o.Message = newObject.Message
     o.Timestamp = newObject.Timestamp
 
-    output = o
+    output = o*/
   case MsgPackMode:
     data, err = o.MarshalMsg(nil)
-    // fmt.Println("o = ", *o)
+    fmt.Println(string(data), "(Go)")
     dataStr := string(data)
     var CData *C.char
     CData = C.CString(dataStr)
@@ -119,6 +127,7 @@ func (d *Dispatcher) Dispatch(o *Object) (interface{}, error) {
 
     var newObject Object
     newObject.UnmarshalMsg(outputBytes)
+    output = newObject
 
     // fmt.Println("o2 = ", newObject)
 
