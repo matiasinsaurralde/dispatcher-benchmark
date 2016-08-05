@@ -19,10 +19,12 @@ def dispatch_native_object(name, message, timestamp):
 def dispatch_msgpack_object(serialized_object):
     # print("serialized_object:", len(serialized_object))
     # print(serialized_object)
-    object = msgpack.unpackb(serialized_object, use_list=False)
-    # object[b'message'] = b'modified message'
-    # object[b'ts'] = 100
-    new_object = msgpack.packb(object)
-    # print("new_object:", len(new_object))
-    # print(new_object)
+    print(serialized_object, "(Python)")
+    object = msgpack.unpackb(serialized_object, use_list=True, encoding='utf-8')
+    # object[b'name'] = b'theOtherObject'
+    # object[b'message'] = b'someothermessage'
+    # object[b'ts'] = 40
+    object['nested_object']['string_field'] = "new string value"
+    new_object = msgpack.packb(object, encoding='utf-8')
+    print(new_object, "(Python, modified object)")
     return new_object
