@@ -3,7 +3,7 @@ package main
 import(
   "github.com/matiasinsaurralde/dispatcher-benchmark"
 
-  "time"
+  // "time"
   "fmt"
 )
 
@@ -24,13 +24,22 @@ func main() {
 
   shinyDispatcher := dispatcher.NewDispatcher(dispatcher.MsgPackMode)
 
+  nestedObject := dispatcher.NestedObject{
+    NestedStringField: "nested",
+    NestedIntField: 22,
+  }
+
   object := dispatcher.Object{
     Name: "theObject",
     Message: "the message",
-    Timestamp: time.Now().Unix(),
+    Timestamp: 20,
+    NestedObject: nestedObject,
   }
 
-  fmt.Println( shinyDispatcher.Dispatch(&object) )
+  fmt.Println(object, "(Go, original object)")
+
+  fmt.Print( shinyDispatcher.Dispatch(&object) )
+  fmt.Println(" (Go, deserialized object)")
   /*
   var output interface{}
   output, err = shinyDispatcher.Dispatch(&object)
