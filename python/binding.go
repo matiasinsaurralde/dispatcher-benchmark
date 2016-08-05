@@ -144,6 +144,8 @@ static char* Python_DispatchMsgPackObject(void *p) {
   // PyObject* output = PyTuple_GetItem(result, 0);
   char* outputString = PyBytes_AsString(result);
 
+  printf("%s (C, output string)\n", outputString);
+
   // return serializedObject;
   return outputString;
 };
@@ -156,10 +158,17 @@ import(
   "unsafe"
 )
 
+
+type NestedObject struct {
+  NestedStringField string `msg;"string_field"`
+  NestedIntField int `msg:"int_field"`
+}
+
 type Object struct {
   Name string `msg:"name"`
   Message string `msg:"message"`
-  Timestamp int64 `msg:"ts"`
+  Timestamp int `msg:"ts"`
+  NestedObject NestedObject `msg:"nested_object"`
 }
 
 func Init() error {
@@ -218,7 +227,7 @@ func DispatchNativeObject(object unsafe.Pointer) Object {
   obj := Object{
     Name: C.GoString(Cobj.name),
     Message: C.GoString(Cobj.message),
-    Timestamp: int64(Cobj.timestamp),
+    Timestamp: int(Cobj.timestamp),
   }
 
   C.free(unsafe.Pointer(Cobj))
