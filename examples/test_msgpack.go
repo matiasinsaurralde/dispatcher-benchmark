@@ -24,22 +24,21 @@ func main() {
 
   shinyDispatcher := dispatcher.NewDispatcher(dispatcher.MsgPackMode)
 
+  /*
   nestedObject := dispatcher.NestedObject{
-    NestedStringField: "nested",
+    NestedStringField: "long stringlong stringlong stringlong stringlong stringlong stringlong stringlong stringlong stringlong stringlong stringlong string",
     NestedIntField: 22,
   }
+  */
 
   object := dispatcher.Object{
     Name: "theObject",
     Message: "the message",
     Timestamp: 20,
-    NestedObject: nestedObject,
+    // NestedObject: nestedObject,
   }
 
-  fmt.Println(object, "(Go, original object)")
-
-  fmt.Print( shinyDispatcher.Dispatch(&object) )
-  fmt.Println(" (Go, deserialized object)")
+  shinyDispatcher.Dispatch(&object)
   /*
   var output interface{}
   output, err = shinyDispatcher.Dispatch(&object)

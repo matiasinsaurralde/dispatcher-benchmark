@@ -144,7 +144,7 @@ static char* Python_DispatchMsgPackObject(void *p) {
   // PyObject* output = PyTuple_GetItem(result, 0);
   char* outputString = PyBytes_AsString(result);
 
-  printf("%s (C, output string)\n", outputString);
+  // printf("%s (C, output string)\n", outputString);
 
   // return serializedObject;
   return outputString;

@@ -2,7 +2,7 @@ package dispatcher
 
 import(
   "testing"
-  "time"
+  // "time"
   "fmt"
 
   "encoding/json"
@@ -26,7 +26,7 @@ func BenchmarkJsonStringMode(b *testing.B) {
     object := Object{
       Name: "theObject",
       Message: "the message",
-      Timestamp: time.Now().Unix(),
+      // Timestamp: time.Now().Unix(),
     }
     // time.Sleep(1*time.Millisecond)
     var output interface{}
@@ -46,7 +46,8 @@ func BenchmarkUjsonStringMode(b *testing.B) {
     object := Object{
       Name: "theObject",
       Message: "the message",
-      Timestamp: time.Now().Unix(),
+      Timestamp: 11,
+      // Timestamp: time.Now().Unix(),
     }
     // time.Sleep(1*time.Millisecond)
     var output interface{}
@@ -66,7 +67,8 @@ func BenchmarkNativeMode(b *testing.B) {
     object := Object{
       Name: "theObject",
       Message: "the message",
-      Timestamp: time.Now().Unix(),
+      Timestamp: 11,
+      // Timestamp: time.Now().Unix(),
     }
     // time.Sleep(1*time.Millisecond)
     d.Dispatch(&object)
@@ -81,7 +83,8 @@ func BenchmarkMsgPackMode(b *testing.B) {
     object := Object{
       Name: "theObject",
       Message: "the message",
-      Timestamp: time.Now().Unix(),
+      Timestamp: 11,
+      // Timestamp: time.Now().Unix(),
     }
     // time.Sleep(1*time.Millisecond)
     d.Dispatch(&object)

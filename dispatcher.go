@@ -5,7 +5,7 @@ import(
 
   "encoding/json"
   "unsafe"
-  "fmt"
+  // "fmt"
 )
 
 /*
@@ -43,18 +43,18 @@ type Dispatcher struct {
   Mode int
 }
 
-//go:generate msgp
+/*go:generate msgp
 type NestedObject struct {
   NestedStringField string `msg:"string_field"`
   NestedIntField int `msg:"int_field"`
-}
+}*/
 
 //go:generate msgp
 type Object struct {
   Name string `msg:"name"`
   Message string `msg:"message"`
   Timestamp int `msg:"ts"`
-  NestedObject NestedObject `msg:"nested_object"`
+  // NestedObject NestedObject `msg:"nested_object"`
 }
 
 func NewDispatcher(mode int) Dispatcher {
@@ -117,10 +117,16 @@ func (d *Dispatcher) Dispatch(o *Object) (interface{}, error) {
     output = o*/
   case MsgPackMode:
     data, err = o.MarshalMsg(nil)
-    fmt.Println(string(data), "(Go)")
+    // fmt.Println(string(data), "(Go)")
     dataStr := string(data)
     var CData *C.char
     CData = C.CString(dataStr)
+
+    // *** EXPERIMENTAL ***
+    // var someObject Object
+    // someObject.UnmarshalMsg(data)
+    // fmt.Println("someObject = ", someObject)
+    //
 
     var outputBytes []byte
     outputBytes = python.DispatchMsgPackObject(unsafe.Pointer(CData))
